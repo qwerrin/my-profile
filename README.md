@@ -1,2 +1,7 @@
-# my-dev-journey
-JavaScript学習ログ ＆ 成長可視化ダッシュボード
+# My Plofile - 自己紹介ページ
+
+自己紹介ページです。
+勉強してできることが増えたりしたら更新していきます。
+
+## 🚀 現在の公開サイト
+[https://qwerrin.github.io/my-dev-journey/](https://qwerrin.github.io/my-dev-journey/)
