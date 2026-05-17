@@ -4,4 +4,4 @@
 勉強してできることが増えたりしたら更新していきます。
 
 ## 🚀 現在の公開サイト
-[(https://qwerrin.github.io/my-profile/)]
+[https://qwerrin.github.io/my-profile/]
