@@ -187,11 +187,6 @@ a {
   }
 }
 
-.about-image {
-  display: flex;
-  justify-content: center;
-}
-
 .avatar {
   width: 180px;
   height: 180px;
@@ -230,9 +225,4 @@ a {
       color: var(--color-primary);
     }
   }
-}
-
-.site-footer p {
-  margin: 0;
-  opacity: 0.8;
 }
