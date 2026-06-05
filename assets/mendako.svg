@@ -1,0 +1,45 @@
+<!-- 【後で本物のアイコンに差し替え】暫定メンダコSVGプレースホルダ -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="メンダコのアイコン">
+  <defs>
+    <radialGradient id="bodyGrad" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#7ecad4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#2a7fa0" stop-opacity="0.7"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 胴体（マント状の丸いボディ） -->
+  <ellipse cx="100" cy="95" rx="58" ry="52" fill="url(#bodyGrad)" filter="url(#glow)" opacity="0.92"/>
+
+  <!-- ヒレ（左） -->
+  <ellipse cx="46" cy="80" rx="20" ry="11" fill="#5fd3e0" opacity="0.65" transform="rotate(-20 46 80)"/>
+  <!-- ヒレ（右） -->
+  <ellipse cx="154" cy="80" rx="20" ry="11" fill="#5fd3e0" opacity="0.65" transform="rotate(20 154 80)"/>
+
+  <!-- 目（左） -->
+  <circle cx="84" cy="88" r="9" fill="#0d2847" opacity="0.9"/>
+  <circle cx="84" cy="88" r="4" fill="#e8eef2"/>
+  <circle cx="86" cy="86" r="1.5" fill="#fff"/>
+  <!-- 目（右） -->
+  <circle cx="116" cy="88" r="9" fill="#0d2847" opacity="0.9"/>
+  <circle cx="116" cy="88" r="4" fill="#e8eef2"/>
+  <circle cx="118" cy="86" r="1.5" fill="#fff"/>
+
+  <!-- 触手（8本、短め） -->
+  <g opacity="0.75" stroke="#5fd3e0" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <path d="M72 140 Q68 158 65 168"/>
+    <path d="M82 144 Q80 162 79 172"/>
+    <path d="M92 147 Q92 165 92 175"/>
+    <path d="M102 147 Q103 165 104 175"/>
+    <path d="M112 144 Q114 162 115 172"/>
+    <path d="M122 140 Q126 158 129 168"/>
+    <path d="M131 134 Q138 150 143 160"/>
+    <path d="M63 134 Q56 150 51 160"/>
+  </g>
+
+  <!-- 発光アクセント（縁取り） -->
+  <ellipse cx="100" cy="95" rx="58" ry="52" fill="none" stroke="#5fd3e0" stroke-width="1.5" opacity="0.4"/>
+</svg>

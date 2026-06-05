@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>【後で差し替え：ハンドル名】 — Portfolio</title>
+  <meta name="description" content="現場で必要な技術をキャッチアップし、動くものを形にします。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS変数（深海パレット） ===== */
+    :root {
+      --bg-top:    #07111f;
+      --bg-mid:    #0d2847;
+      --bg-bottom: #050b16;
+      --text:        #e8eef2;
+      --text-muted:  #9fb2c4;
+      --glow-cyan:  #5fd3e0;
+      --glow-green: #9fe8c0;
+      --surface:        rgba(255, 255, 255, 0.04);
+      --surface-border: rgba(159, 178, 196, 0.18);
+      --nav-height: 60px;
+      --max-width: 840px;
+    }
+
+    /* ===== リセット ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', system-ui, sans-serif;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.85;
+      min-height: 100vh;
+      background-color: var(--bg-top);
+      overflow-x: hidden;
+    }
+
+    /* ===== 背景グラデーション（固定） ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+      z-index: -2;
+    }
+
+    /* ===== 漂う光の粒 ===== */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      animation: drift linear infinite;
+    }
+    .particle.cyan {
+      background: var(--glow-cyan);
+      box-shadow: 0 0 8px 3px rgba(95, 211, 224, 0.5);
+    }
+    .particle.green {
+      background: var(--glow-green);
+      box-shadow: 0 0 8px 3px rgba(159, 232, 192, 0.4);
+    }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1);   opacity: 0; }
+      15%  { opacity: 1; }
+      50%  { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0.7; }
+      85%  { opacity: 1; }
+      100% { transform: translate(0, 0) scale(1);   opacity: 0; }
+    }
+
+    /* ===== ナビゲーション ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      background: rgba(7, 17, 31, 0.5);
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s, border-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav.scrolled {
+      background: rgba(7, 17, 31, 0.85);
+      border-color: var(--surface-border);
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: var(--max-width);
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--glow-cyan);
+      letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.8rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--glow-cyan); }
+
+    /* ハンバーガー（スマホ） */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ===== 共通レイアウト ===== */
+    .section {
+      padding: 6rem 1.5rem;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--glow-cyan);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 2.5rem;
+      color: var(--text);
+    }
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--glow-cyan);
+      opacity: 0.5;
+      margin: 1rem 0 2.5rem;
+    }
+
+    /* ===== スクロールリビール ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== ヒーロー ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 1.5rem;
+      padding-top: var(--nav-height);
+    }
+    .hero-icon {
+      width: 140px;
+      height: 140px;
+      margin-bottom: 2rem;
+      animation: float 7s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(95, 211, 224, 0.35));
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-14px); }
+    }
+    .hero-handle {
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      color: var(--glow-cyan);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .hero-name {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      color: var(--text);
+    }
+    .hero-catch {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--text);
+      margin-bottom: 0.8rem;
+      max-width: 520px;
+    }
+    .hero-sub {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+    .scroll-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: scrollBounce 2.4s ease-in-out infinite;
+    }
+    .scroll-hint svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--glow-cyan);
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50%       { transform: translateY(6px); opacity: 1; }
+    }
+
+    /* ===== About ===== */
+    #about .about-text {
+      font-size: 1rem;
+      line-height: 2;
+      color: var(--text);
+      max-width: 640px;
+    }
+
+    /* ===== Skills ===== */
+    .skills-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+    .skill-category h3 {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .chip {
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      font-size: 0.82rem;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .chip:hover {
+      border-color: var(--glow-cyan);
+      box-shadow: 0 0 8px rgba(95, 211, 224, 0.2);
+      transform: translateY(-2px);
+    }
+    .skills-note {
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== Works ===== */
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .work-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    }
+    .work-card:hover {
+      border-color: rgba(95, 211, 224, 0.4);
+      box-shadow: 0 0 20px rgba(95, 211, 224, 0.08);
+      transform: translateY(-2px);
+    }
+    .work-card-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--glow-cyan);
+      margin-bottom: 0.6rem;
+    }
+    .work-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+    .work-card p {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 1.2rem;
+    }
+    .work-techs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+    .work-tech {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 4px;
+      background: rgba(95, 211, 224, 0.1);
+      color: var(--glow-cyan);
+      border: 1px solid rgba(95, 211, 224, 0.2);
+    }
+    .work-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--glow-cyan);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .work-link:hover { border-color: var(--glow-cyan); }
+    .work-link.coming-soon {
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    /* ===== Career ===== */
+    .career-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .career-item {
+      display: grid;
+      grid-template-columns: 1px 1fr;
+      gap: 0 1.8rem;
+      position: relative;
+      padding-bottom: 2.5rem;
+    }
+    .career-item:last-child { padding-bottom: 0; }
+    .career-line {
+      background: var(--surface-border);
+      position: relative;
+    }
+    .career-line::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--glow-cyan);
+      box-shadow: 0 0 8px rgba(95, 211, 224, 0.6);
+    }
+    .career-content {}
+    .career-era {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--glow-cyan);
+      margin-bottom: 0.4rem;
+    }
+    .career-content h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+    .career-content ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .career-content li {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      padding-left: 1rem;
+      position: relative;
+    }
+    .career-content li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--surface-border);
+    }
+
+    /* ===== Contact ===== */
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 1.4rem;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      max-width: 360px;
+    }
+    .contact-link:hover {
+      border-color: rgba(95, 211, 224, 0.4);
+      box-shadow: 0 0 12px rgba(95, 211, 224, 0.1);
+      transform: translateY(-2px);
+    }
+    .contact-link-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      fill: var(--glow-cyan);
+    }
+    .contact-note {
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      border-top: 1px solid var(--surface-border);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ===== レスポンシブ ===== */
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        background: rgba(7, 17, 31, 0.97);
+        border-bottom: 1px solid var(--surface-border);
+        padding: 1rem 0;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a {
+        padding: 0.7rem 1.5rem;
+        width: 100%;
+        text-align: center;
+      }
+      .nav-toggle { display: flex; }
+      .section { padding: 4rem 1.2rem; }
+      .hero-icon { width: 110px; height: 110px; }
+    }
+
+    /* ===== prefers-reduced-motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .hero-icon { animation: none; }
+      .scroll-hint { animation: none; opacity: 0.6; }
+      .particle { animation: none; opacity: 0; }
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 漂う光の粒 -->
+  <div class="particles" aria-hidden="true" id="particles"></div>
+
+  <!-- ナビゲーション -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo">【ハンドル名】</a>
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#works">Works</a></li>
+        <li><a href="#career">Career</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <section id="hero">
+    <img
+      src="assets/mendako.svg"
+      alt="メンダコのアイコン"
+      class="hero-icon"
+      width="140"
+      height="140"
+    >
+    <p class="hero-handle">【後で差し替え：ハンドル名（例：メンダコ）】</p>
+    <h1 class="hero-name">現場で必要な技術を<br>キャッチアップし、<br>動くものを形にします。</h1>
+    <p class="hero-catch">飲食業界での現場経験 × 複数の開発現場での実務経験</p>
+    <a href="#about" class="scroll-hint" aria-label="下にスクロール">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      Scroll
+    </a>
+  </section>
+
+  <!-- ===== About ===== -->
+  <section id="about">
+    <div class="section reveal">
+      <p class="section-label">About</p>
+      <h2 class="section-title">自己紹介</h2>
+      <div class="divider"></div>
+      <p class="about-text">
+        金融系・組み込み・Web系など複数の開発現場で実務を経験し、現場ごとに必要な技術をキャッチアップしながら成果を出してきました。その後、飲食業界で5年間の現場経験（ホール・キッチン・アシスタントマネージャー）を積みました。現在は、この「IT実務」と「飲食業界の現場知識」を掛け合わせ、飲食店向けのAI業務自動化に取り組んでいます。新しい技術を学びながら手を動かして完成まで持っていく、という働き方を一貫して続けてきました。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Skills ===== -->
+  <section id="skills">
+    <div class="section reveal">
+      <p class="section-label">Skills</p>
+      <h2 class="section-title">スキル</h2>
+      <div class="divider"></div>
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3>得意・現在のメイン</h3>
+          <div class="skill-chips">
+            <span class="chip">Next.js</span>
+            <span class="chip">TypeScript</span>
+            <span class="chip">Tailwind CSS</span>
+            <span class="chip">Supabase</span>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3>言語</h3>
+          <div class="skill-chips">
+            <span class="chip">Python</span>
+            <span class="chip">JavaScript</span>
+            <span class="chip">HTML / CSS</span>
+            <span class="chip">C</span>
+            <span class="chip">PL/SQL</span>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3>その他・ツール</h3>
+          <div class="skill-chips">
+            <span class="chip">Git / GitHub</span>
+            <span class="chip">Vercel</span>
+            <span class="chip">Claude Code</span>
+            <span class="chip">LINE Messaging API</span>
+          </div>
+        </div>
+      </div>
+      <p class="skills-note">※ 各案件で必要に応じてキャッチアップしながら実務に対応してきました。<br>【一部は習得中。後で調整】</p>
+    </div>
+  </section>
+
+  <!-- ===== Works ===== -->
+  <section id="works">
+    <div class="section reveal">
+      <p class="section-label">Works</p>
+      <h2 class="section-title">制作実績</h2>
+      <div class="divider"></div>
+      <div class="works-grid">
+
+        <!-- カード1 -->
+        <article class="work-card">
+          <p class="work-card-label">Web / Landing Page</p>
+          <h3>飲食店向け営業ページ</h3>
+          <p>飲食店オーナー向けに、AI業務自動化サービスを紹介する1枚もののランディングページ。和の世界観（暖簾をイメージした配色）、スマホ対応、アクセシビリティ（コントラスト基準）を意識して制作。</p>
+          <div class="work-techs">
+            <span class="work-tech">Next.js</span>
+            <span class="work-tech">TypeScript</span>
+            <span class="work-tech">Tailwind CSS</span>
+          </div>
+          <a href="【後で差し替え：営業ページの公開URL】" class="work-link" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View Project
+          </a>
+        </article>
+
+        <!-- カード2 -->
+        <article class="work-card">
+          <p class="work-card-label">Bot / AI</p>
+          <h3>居酒屋向けAIデモボット</h3>
+          <p>LINEから届く問い合わせ・予約に自動応答するデモ。手書きルールではなく意味で答えるFAQ（RAG）と、データベース連携による予約管理を実装。</p>
+          <div class="work-techs">
+            <span class="work-tech">LINE Messaging API</span>
+            <span class="work-tech">Supabase</span>
+            <span class="work-tech">Dify</span>
+          </div>
+          <span class="work-link coming-soon">
+            Coming Soon（近日公開）
+          </span>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Career ===== -->
+  <section id="career">
+    <div class="section reveal">
+      <p class="section-label">Career</p>
+      <h2 class="section-title">経歴</h2>
+      <div class="divider"></div>
+      <div class="career-list">
+
+        <div class="career-item">
+          <div class="career-line"></div>
+          <div class="career-content">
+            <p class="career-era">現在</p>
+            <h3>フリーランス / 自主開発</h3>
+            <ul>
+              <li>IT実務 × 飲食現場経験を掛け合わせ、飲食店向けの AI業務自動化サービスを準備中</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="career-item">
+          <div class="career-line"></div>
+          <div class="career-content">
+            <p class="career-era">飲食業界（5年）</p>
+            <h3>ホール・キッチン・アシスタントマネージャー</h3>
+            <ul>
+              <li>店舗オペレーションを現場で習得</li>
+              <li>ホール・キッチン・アシスタントマネージャーを経験</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="career-item">
+          <div class="career-line"></div>
+          <div class="career-content">
+            <p class="career-era">IT業界（正社員・SES）</p>
+            <h3>ソフトウェアエンジニア</h3>
+            <ul>
+              <li>金融系システムで、PL/SQL を用いたデータベース周りの開発に従事</li>
+              <li>組み込み系（C言語）の開発現場を経験</li>
+              <li>Python・HTML・CSS・JavaScript を用いた Web系の開発に従事</li>
+              <li>各現場で必要な技術をキャッチアップしながら実装・対応</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Contact ===== -->
+  <section id="contact">
+    <div class="section reveal">
+      <p class="section-label">Contact</p>
+      <h2 class="section-title">連絡先 / SNS</h2>
+      <div class="divider"></div>
+      <div class="contact-links">
+
+        <a href="【後で差し替え：XのURL】" class="contact-link" target="_blank" rel="noopener">
+          <!-- X（旧Twitter）アイコン -->
+          <svg class="contact-link-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25zM17.083 20.25h1.834L7.083 4.126H5.117z"/>
+          </svg>
+          X（旧 Twitter）
+        </a>
+
+        <a href="【後で差し替え：noteのURL】" class="contact-link" target="_blank" rel="noopener">
+          <!-- note アイコン（簡易） -->
+          <svg class="contact-link-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 3h8v1.5H8V9zm0 3h8v1.5H8V12zm0 3h5v1.5H8V15z"/>
+          </svg>
+          note
+        </a>
+
+        <a href="【後で差し替え：問い合わせ手段（フォームURL等）】" class="contact-link" target="_blank" rel="noopener">
+          <!-- メールアイコン -->
+          <svg class="contact-link-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          お問い合わせ
+        </a>
+
+      </div>
+      <p class="contact-note">※ 本名・住所などは掲載しておりません。お問い合わせはリンク先よりお願いします。</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 【後で差し替え：ハンドル名】</p>
+  </footer>
+
+  <script>
+    // ===== 光の粒を生成 =====
+    (function () {
+      const container = document.getElementById('particles');
+      const count = 14;
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        const isCyan = Math.random() > 0.4;
+        el.className = 'particle ' + (isCyan ? 'cyan' : 'green');
+
+        // ヒーロー周辺に集中（上60%に多く）
+        const topRatio = i < 9 ? Math.random() * 60 : 60 + Math.random() * 35;
+        const size = 2 + Math.random() * 3;
+        const duration = 8 + Math.random() * 10;
+        const delay = -(Math.random() * duration);
+        const dx = (Math.random() - 0.5) * 40 + 'px';
+        const dy = (Math.random() - 0.5) * 30 + 'px';
+
+        el.style.cssText = [
+          'width:' + size + 'px',
+          'height:' + size + 'px',
+          'top:' + topRatio + '%',
+          'left:' + (5 + Math.random() * 90) + '%',
+          '--dx:' + dx,
+          '--dy:' + dy,
+          'animation-duration:' + duration + 's',
+          'animation-delay:' + delay + 's',
+        ].join(';');
+
+        container.appendChild(el);
+      }
+    })();
+
+    // ===== ナビ：スクロールで色変化 =====
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', function () {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ===== ハンバーガーメニュー =====
+    const toggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    toggle.addEventListener('click', function () {
+      const isOpen = navLinks.classList.toggle('open');
+      toggle.classList.toggle('open', isOpen);
+      toggle.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+    });
+    navLinks.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        navLinks.classList.remove('open');
+        toggle.classList.remove('open');
+        toggle.setAttribute('aria-label', 'メニューを開く');
+      });
+    });
+
+    // ===== スクロールリビール（IntersectionObserver） =====
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function (el) { observer.observe(el); });
+  </script>
+</body>
+</html>
